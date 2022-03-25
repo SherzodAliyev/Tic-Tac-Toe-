@@ -1,0 +1,177 @@
+package tictactoe;
+
+import java.util.Scanner;
+import java.util.Arrays;
+
+public class Main {
+    public static Scanner sc = new Scanner(System.in);
+    public static void main(String[] args) {
+        // write your code here
+        char[][] gridField = { {' ', ' ', ' '},
+                               {' ', ' ', ' '},
+                               {' ', ' ', ' '}};
+        // prints an empty grid at the beginning of the game
+        print(gridField);
+        //     
+        asksCellCoordinates(gridField);
+    }
+    
+    public static void asksCellCoordinates(char[][] grid) {
+        boolean hasSpaces = true;
+        boolean p1Turn = true;
+        int allSymbolsCount = 0; 
+        while (hasSpaces) {
+            System.out.print("Enter the coordinates: ");
+            String strIn = sc.nextLine();
+            
+            String exactLocat = locationInput(strIn);
+            if ("str".equals(exactLocat)) {
+                System.out.println("\nYou should enter numbers!");
+            } else if ("notInRange".equals(exactLocat)) {
+                System.out.println("Coordinates should be from 1 to 3!");
+            } else if (grid[Integer.parseInt(exactLocat.substring(0, 1)) - 1][Integer.parseInt(exactLocat.substring(2)) - 1] != ' ') {
+                System.out.println("This cell is occupied! Choose another one!");
+            } else {
+                allSymbolsCount++;
+                
+                if (p1Turn) {
+                    grid[Integer.parseInt(exactLocat.substring(0, 1)) - 1][Integer.parseInt(exactLocat.substring(2)) - 1] = 'X';
+                    print(grid);
+                    p1Turn = false;
+                    
+                    // checks for 3XsInRow
+                    if (threeSymbolsInRow(grid, 'X')) {
+                        System.out.println("X wins");
+                        hasSpaces = false;
+                    }
+                } else {
+                    grid[Integer.parseInt(exactLocat.substring(0, 1)) - 1][Integer.parseInt(exactLocat.substring(2)) - 1] = 'O';
+                    print(grid);
+                    p1Turn = true;
+                    
+                    // checks for 3OsInRow
+                    if (threeSymbolsInRow(grid, 'O')) {
+                        System.out.println("O wins");
+                        hasSpaces = false;
+                    }
+                }
+                
+            } 
+            // counts whitespaces and terminates with the hint "Draw" if there is no empty coordinate
+            if (hasSpaces && allSymbolsCount == 9) {
+                print(grid);
+                System.out.println("Draw");
+                hasSpaces = false;
+            }
+        }
+    }
+    
+    public static String locationInput(String arr) {
+       String[] input = arr.split("\\s");
+        boolean word = false;
+        try {
+            Integer.parseInt(input[0]);
+            Integer.parseInt(input[1]);
+        } catch (Exception e) {
+            word = true;
+        }
+        
+        if (word) return "str";
+        
+        int n1 = Integer.parseInt(input[0]);
+        int n2 = Integer.parseInt(input[1]);
+        
+        if (n1 > 3 || n1 < 1 || n2 > 3 || n1 < 1) {
+            return "notInRange";
+        }
+        return n1 + " " + n2;
+    }
+    
+    // checks the game state like finished, draw, impossible and so on
+    /* public static String analyzeGameState(char[][] field) {
+        int countXs = countChar(field, 'X');
+        int countOs = countChar(field, 'O');
+        boolean xsInRow = threeSymbolsInRow(field, 'X');
+        boolean osInRow = threeSymbolsInRow(field, 'O');
+        
+        if (xsInRow) {
+            return "X wins";
+        } else if (osInRow) {
+            return "O wins";
+        } else if (countOs + countXs == 9) {
+            return "Draw";
+        } else {
+            return "Game";
+        }
+        
+    }
+    // counts xs and os
+    public static int countChar(char[][] grid, char elm) {
+        int count = 0;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (elm == grid[i][j]) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    } */
+    
+    public static boolean threeSymbolsInRow(char[][] grid, char ch) {
+        boolean has3InRow = false;
+        int count = 0;
+        for (int i = 0; i < 3; i++) {
+            count = 0;
+            for (int j = 0; j < 3; j++) {
+                if (ch == grid[i][j]) {
+                    count++;
+                }
+            }
+            if (count == 3) {
+                has3InRow = true;
+                break;
+            }
+        }
+        // return if symbol in position of winning
+        if (has3InRow) return true;
+        
+        for (int i = 0; i < 3; i++) {
+            count = 0;
+            for (int j = 0; j < 3; j++) {
+                if (ch == grid[j][i]) {
+                    count++;
+                }
+            }
+            if (count == 3) {
+                has3InRow = true;
+                break;
+            }
+        }
+        
+        // return if symbol in position of winning
+        if (has3InRow) return true;
+        
+        if (ch == grid[0][0] && ch == grid[1][1] && ch == grid[2][2] ||
+                ch == grid[0][2] && ch == grid[1][1] && ch == grid[2][0]) {
+            return true;        
+        }
+        
+        return false;
+    }
+    
+    public static void print(char[][] grid) {
+        System.out.println("---------");
+        for (int i = 0; i < 3; i++) {
+            System.out.print('|');
+            for (int j = 0; j < 3; j++) {
+                System.out.printf(" %c", grid[i][j]);    
+            }
+            System.out.print(" |");
+            System.out.println();
+        }
+        System.out.println("---------");
+    }
+    
+    
+}
